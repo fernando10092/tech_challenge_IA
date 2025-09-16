@@ -1,0 +1,61 @@
+# Ambiente virtual
+env/
+venv/
+ENV/
+.venv/
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+*.swp
+*.swo
+*.DS_Store
+
+# Arquivos de log
+*.log
+
+# Banco de dados SQLite
+db.sqlite3
+*.sqlite3
+
+# Arquivos de mídia e uploads
+/media/
+/uploads/
+
+# Arquivos de migrações compilados
+myapp/migrations/__pycache__/
+myapp/__pycache__/
+*/__pycache__/
+
+# Configurações locais
+*.env
+.env
+*.local
+
+# Cache do Django
+*.pot
+*.pyc
+*.mo
+*.egg-info/
+*.egg
+*.manifest
+*.spec
+
+# VSCode
+.vscode/
+*.code-workspace
+
+# PyCharm
+.idea/
+
+# Relatórios e build
+dist/
+build/
+*.egg-info/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Testes
+.coverage
+.tox/
