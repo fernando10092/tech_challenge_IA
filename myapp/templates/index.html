@@ -104,6 +104,21 @@
             border: 2px dashed #adb5bd;
             margin-top: 20px;
         }
+        .prediction-box {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+        }
+        .gain-text {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .loss-text {
+            color: #dc3545;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -123,6 +138,17 @@
             <div class="image-placeholder">
                 O gráfico aparecerá aqui após a busca.
             </div>
+        {% endif %}
+
+        {% if prediction_result is not None %}
+        <h2 class="section-title">Previsão da IA para amanhã</h2>
+        <div class="prediction-box">
+            <p>A previsão para o ativo **{{ ativo }}** é: 
+                <span class="{% if prediction_result == 1 %}gain-text{% else %}loss-text{% endif %}">
+                    {% if prediction_result == 1 %}GAIN (Alta) {% else %}LOSS (Baixa) {% endif %}
+                </span>
+            </p>
+        </div>
         {% endif %}
     </div>
 </body>

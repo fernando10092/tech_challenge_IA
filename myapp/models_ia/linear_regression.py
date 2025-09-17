@@ -4,46 +4,47 @@ from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 import seaborn as sns
+import joblib
 
-# Carregar planilha
-arquivo = pd.read_excel("data_extract/2025-09-14.xlsx")
 
-# Converter coluna "data" para datetime
-arquivo["data"] = pd.to_datetime(arquivo["data"])
+def Ia_Prediction():
+    # Carregar planilha
+    arquivo = pd.read_excel("data_extract/2025-09-14.xlsx")
 
-# Transformar data em número (ex: dias desde a primeira data)
-arquivo["data"] = (arquivo["data"] - arquivo["data"].min()).dt.days
+    # Converter coluna "data" para datetime
+    arquivo["data"] = pd.to_datetime(arquivo["data"])
 
-# One-Hot Encoding para id
-arquivo = pd.get_dummies(arquivo, columns=["id"], drop_first=True)
+    # Transformar data em número (ex: dias desde a primeira data)
+    arquivo["data"] = (arquivo["data"] - arquivo["data"].min()).dt.days
 
-# Codificar status (target)
-arquivo["status"] = arquivo["status"].map({"gain": 1, "loss": 0})
+    # One-Hot Encoding para id
+    arquivo = pd.get_dummies(arquivo, columns=["id"], drop_first=True)
 
-# Features e target
-x = arquivo.drop("status", axis=1)
-y = arquivo["status"]
+    # Codificar status (target)
+    arquivo["status"] = arquivo["status"].map({"gain": 1, "loss": 0})
 
-# Treino e teste
-x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=42)
+    # Features e target
+    x = arquivo.drop("status", axis=1)
+    y = arquivo["status"]
 
-# Modelo de classificação
-modelo = LogisticRegression(max_iter=1000)
-modelo.fit(x_train, y_train)
+    # Treino e teste
+    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=42)
 
-# Predição
-predict_class = modelo.predict(x_test)
+    # Modelo de classificação
+    modelo = LogisticRegression(max_iter=1000)
+    modelo.fit(x_train, y_train)
 
-# Avaliação
-acuracia = accuracy_score(y_test, predict_class)
-print(f"Acurácia: {acuracia:.2%}")
-print("\nRelatório de Classificação:")
-print(classification_report(y_test, predict_class))
+    # Predição
+    predict_class = modelo.predict(x_test)
 
-# Matriz de confusão
-cm = confusion_matrix(y_test, predict_class)
-sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=["Loss", "Gain"], yticklabels=["Loss", "Gain"])
-plt.xlabel("Previsto")
-plt.ylabel("Real")
-plt.title("Matriz de Confusão")
-plt.show()
+    # Avaliação
+    acuracia = accuracy_score(y_test, predict_class)
+    print(f"Acurácia: {acuracia:.2%}")
+    print("\nRelatório de Classificação:")
+    print(classification_report(y_test, predict_class))
+
+    # Salvar o modelo treinado para uso posterior
+    joblib.dump(modelo, 'modelo_treinado.pkl')
+
+   
+Ia_Prediction()
