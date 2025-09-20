@@ -7,24 +7,17 @@ import datetime as dt
 modelo = joblib.load('modelo_treinado.pkl')
 
 def Predict(ativo_id, data_dias):
-    """
-    Realiza a predição para um ativo específico de forma otimizada.
-    Args:
-        ativo_id (str): O ID do ativo (ex: "ABEV3").
-        data_dias (int): A data em dias desde a data de referência do treino.
-    Returns:
-        int: A predição (1 para gain, 0 para loss).
-    """
-    # 1. Carregar a lista de IDs do arquivo de treino.
+
+    # Carregar a lista de IDs do arquivo de treino.
     treino_df = pd.read_excel("data_extract/2025-09-14.xlsx")
     todos_os_ids = sorted(treino_df['id'].unique())
     
-    # 2. Criar um DataFrame com todas as colunas necessárias de uma só vez.
+    # Criar um DataFrame com todas as colunas necessárias de uma só vez.
     #    Começa com a coluna 'data' e adiciona todas as colunas dummy.
     #    O `reindex` já lida com a ordem das colunas e preenche com 0.
     colunas = ['data'] + [f'id_{i}' for i in todos_os_ids if i != todos_os_ids[0]]
     
-    # 3. Criar uma linha de dados com o formato correto.
+    # Criar uma linha de dados com o formato correto.
     linha_dados = [data_dias]
     
     # Encontrar a posição do ativo_id na lista ordenada de IDs

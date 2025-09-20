@@ -14,16 +14,16 @@ def Ia_Prediction():
     # Converter coluna "data" para datetime
     arquivo["data"] = pd.to_datetime(arquivo["data"])
 
-    # Transformar data em número (ex: dias desde a primeira data)
+    # Transformar data em número
     arquivo["data"] = (arquivo["data"] - arquivo["data"].min()).dt.days
 
-    # One-Hot Encoding para id
+    # Converter coluna "id" em variáveis dummy (one-hot encoding)
     arquivo = pd.get_dummies(arquivo, columns=["id"], drop_first=True)
 
-    # Codificar status (target)
+    # Codificar status
     arquivo["status"] = arquivo["status"].map({"gain": 1, "loss": 0})
 
-    # Features e target
+    # Minhas colunas para treino e teste
     x = arquivo.drop("status", axis=1)
     y = arquivo["status"]
 
