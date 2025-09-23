@@ -6,7 +6,7 @@ import os
 
 # Carrega o modelo treinado uma única vez na inicialização do módulo.
 try:
-    _modelo_ia_global = joblib.load('modelo_treinado.pkl')
+    _modelo_ia_global = joblib.load('myapp/models_ia/modelo_treinado.pkl')
 except FileNotFoundError:
     print("Erro: O arquivo 'modelo_treinado.pkl' não foi encontrado. Por favor, execute o script de treinamento primeiro.")
     _modelo_ia_global = None

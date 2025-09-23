@@ -1,15 +1,17 @@
-from django.shortcuts import render
-from django.http import HttpResponse
-import matplotlib.pyplot as plt
-import io
-import urllib, base64
 import pandas as pd
 import datetime as dt
-from rest_framework.decorators import api_view
-from .models_ia.use_ia import Predict, get_model_performance
+import matplotlib.pyplot as plt
+import io
+import base64
+import urllib
 import matplotlib
-from .api.data_server import Server
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from django.shortcuts import render
+from django.http import HttpResponse
+
+from .models_ia.use_ia import Predict, get_model_performance
+from .api.data_server import Server
 
 matplotlib.use('Agg')
 
@@ -18,6 +20,7 @@ def Home(request):
     graphic = None
     prediction_result = None
     ativo = None
+    predicted_price = None  # Adicione esta variável
     model_accuracy = get_model_performance() # Carrega a acurácia do modelo uma vez
 
     data_list = Server()
@@ -57,12 +60,12 @@ def Home(request):
                 # Para visualização, assume uma variação percentual para a previsão
                 porcentagem_variacao = 0.03 # Exemplo: 3% de variação para o gráfico
                 if prediction_result == 1: # GAIN
-                    preco_previsto = ultimo_preco * (1 + porcentagem_variacao)
+                    predicted_price = ultimo_preco * (1 + porcentagem_variacao)
                 else: # LOSS
-                    preco_previsto = ultimo_preco * (1 - porcentagem_variacao)
+                    predicted_price = ultimo_preco * (1 - porcentagem_variacao)
                     
                 dia_previsto = dados_para_grafico[-1]['dia'] + 1
-                dados_para_grafico.append({'dia': dia_previsto, 'preco': preco_previsto, 'previsao': True})
+                dados_para_grafico.append({'dia': dia_previsto, 'preco': predicted_price, 'previsao': True})
 
 
                 dias = [d['dia'] for d in dados_para_grafico]
@@ -100,7 +103,8 @@ def Home(request):
         'graphic': graphic,
         'prediction_result': prediction_result,
         'ativo': ativo,
-        'model_accuracy': model_accuracy # Passa a acurácia para o template
+        'model_accuracy': model_accuracy, # Passa a acurácia para o template
+        'predicted_price': predicted_price # Passa o valor previsto
     })
     
 @api_view(['GET', 'POST'])

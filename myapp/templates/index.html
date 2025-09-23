@@ -1,176 +1,180 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Análise de Ativos</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background-color: #f0f2f5;
-            color: #333;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Análise de Ativos</title>
+<style>
+body {
+font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+background-color: #f0f2f5;
+color: #333;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+min-height: 100vh;
+margin: 0;
+padding: 20px;
+}
 
-        .container {
-            background-color: #fff;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
-            width: 100%;
-            text-align: center;
-        }
+    .container {
+        background-color: #fff;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        max-width: 600px;
+        width: 100%;
+        text-align: center;
+    }
 
-        h1 {
-            color: #2c3e50;
-            font-size: 2em;
-            margin-bottom: 20px;
-        }
+    h1 {
+        color: #2c3e50;
+        font-size: 2em;
+        margin-bottom: 20px;
+    }
 
-        .section-title {
-            color: #555;
-            font-size: 1.5em;
-            margin-top: 30px;
-            margin-bottom: 15px;
-            border-bottom: 2px solid #e0e0e0;
-            padding-bottom: 10px;
-        }
+    .section-title {
+        color: #555;
+        font-size: 1.5em;
+        margin-top: 30px;
+        margin-bottom: 15px;
+        border-bottom: 2px solid #e0e0e0;
+        padding-bottom: 10px;
+    }
 
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            align-items: center;
-        }
+    form {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
+    }
 
-        input[type="text"] {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            font-size: 1em;
-            transition: border-color 0.3s;
-        }
+    input[type="text"] {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 1em;
+        transition: border-color 0.3s;
+    }
 
-        input[type="text"]:focus {
-            border-color: #3498db;
-            outline: none;
-        }
+    input[type="text"]:focus {
+        border-color: #3498db;
+        outline: none;
+    }
 
-        button {
-            background-color: #3498db;
-            color: white;
-            padding: 12px 25px;
-            border: none;
-            border-radius: 8px;
-            font-size: 1em;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.2s;
-            text-transform: uppercase;
-            font-weight: bold;
-        }
+    button {
+        background-color: #3498db;
+        color: white;
+        padding: 12px 25px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1em;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.2s;
+        text-transform: uppercase;
+        font-weight: bold;
+    }
 
-        button:hover {
-            background-color: #2980b9;
-            transform: translateY(-2px);
-        }
+    button:hover {
+        background-color: #2980b9;
+        transform: translateY(-2px);
+    }
 
-        img {
-            max-width: 100%;
-            height: auto;
-            margin-top: 20px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
+    img {
+        max-width: 100%;
+        height: auto;
+        margin-top: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
 
-        .image-placeholder {
-            width: 100%;
-            height: 300px;
-            background-color: #e9ecef;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #6c757d;
-            font-size: 1.2em;
-            border: 2px dashed #adb5bd;
-            margin-top: 20px;
-        }
-        .prediction-box {
-            margin-top: 20px;
-            padding: 20px;
-            border-radius: 8px;
-            background-color: #f8f9fa;
-            border: 1px solid #e9ecef;
-        }
-        .gain-text {
-            color: #28a745;
-            font-weight: bold;
-        }
-        .loss-text {
-            color: #dc3545;
-            font-weight: bold;
-        }
-        .accuracy-box {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 8px;
-            background-color: #e9f5ff; /* Um azul claro */
-            border: 1px solid #a0d8ff;
-            font-size: 0.9em;
-        }
-        .accuracy-value {
-            font-weight: bold;
-            color: #007bff; /* Azul primário */
-        }
-    </style>
+    .image-placeholder {
+        width: 100%;
+        height: 300px;
+        background-color: #e9ecef;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #6c757d;
+        font-size: 1.2em;
+        border: 2px dashed #adb5bd;
+        margin-top: 20px;
+    }
+    .prediction-box {
+        margin-top: 20px;
+        padding: 20px;
+        border-radius: 8px;
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+    }
+    .gain-text {
+        color: #28a745;
+        font-weight: bold;
+    }
+    .loss-text {
+        color: #dc3545;
+        font-weight: bold;
+    }
+    .accuracy-box {
+        margin-top: 20px;
+        padding: 15px;
+        border-radius: 8px;
+        background-color: #e9f5ff; /* Um azul claro */
+        border: 1px solid #a0d8ff;
+        font-size: 0.9em;
+    }
+    .accuracy-value {
+        font-weight: bold;
+        color: #007bff; /* Azul primário */
+    }
+</style>
+
 </head>
 <body>
-    <div class="container">
-        <h1>Análise de Ativos</h1>
+<div class="container">
+<h1>Análise de Ativos</h1>
 
-        <h2 class="section-title">Escolha o Ativo</h2>
-        <form method="POST">
-            <input name="ativo" type="text" placeholder="Ex: ABCB4" />
-            <button type="submit">Buscar</button>
-        </form>
+    <h2 class="section-title">Escolha o Ativo</h2>
+    <form method="POST">
+        <input name="ativo" type="text" placeholder="Ex: ABCB4" />
+        <button type="submit">Buscar</button>
+    </form>
 
-        <h2 class="section-title">Gráfico de Histórico e Previsão</h2>
-        {% if graphic %}
-            <img src="data:image/png;base64,{{ graphic }}" alt="Gráfico de Previsão" />
-        {% else %}
-            <div class="image-placeholder">
-                O gráfico aparecerá aqui após a busca.
-            </div>
-        {% endif %}
-
-        {% if prediction_result is not None and ativo %}
-        <h2 class="section-title">Previsão da IA para amanhã</h2>
-        <div class="prediction-box">
-            <p>A previsão para o ativo **{{ ativo.upper }}** é: 
-                <span class="{% if prediction_result == 1 %}gain-text{% else %}loss-text{% endif %}">
-                    {% if prediction_result == 1 %}GAIN (Alta) {% else %}LOSS (Baixa) {% endif %}
-                </span>
-            </p>
+    <h2 class="section-title">Gráfico de Histórico e Previsão</h2>
+    {% if graphic %}
+        <img src="data:image/png;base64,{{ graphic }}" alt="Gráfico de Previsão" />
+    {% else %}
+        <div class="image-placeholder">
+            O gráfico aparecerá aqui após a busca.
         </div>
-        {% endif %}
+    {% endif %}
 
-        {% if model_accuracy is not None %}
-        <h2 class="section-title">Performance do Modelo de IA</h2>
-        <div class="accuracy-box">
-            <p>Acurácia do Modelo: <span class="accuracy-value">{{ model_accuracy | floatformat:2 | cut:" " }}%</span></p>
-            <p>
-                </p>
-        </div>
-        {% endif %}
+    {% if prediction_result is not None and ativo %}
+    <h2 class="section-title">Previsão da IA para amanhã</h2>
+    <div class="prediction-box">
+        <p>A previsão para o ativo **{{ ativo.upper }}** é: 
+            <span class="{% if prediction_result == 1 %}gain-text{% else %}loss-text{% endif %}">
+                {% if prediction_result == 1 %}GAIN (Alta) {% else %}LOSS (Baixa) {% endif %}
+            </span>
+        </p>
+        <p>O preço previsto é de **R$ {{ predicted_price|floatformat:2 }}**</p>
     </div>
+    {% endif %}
+
+    {% if model_accuracy is not None %}
+    <h2 class="section-title">Performance do Modelo de IA</h2>
+    <div class="accuracy-box">
+        <p>Acurácia do Modelo: <span class="accuracy-value">{{ model_accuracy | floatformat:2 | cut:" " }}%</span></p>
+        <p>
+            </p>
+    </div>
+    {% endif %}
+</div>
+
 </body>
 </html>
