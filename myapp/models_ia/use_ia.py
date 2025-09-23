@@ -2,59 +2,56 @@ import joblib
 import numpy as np
 import pandas as pd
 import datetime as dt
+import os
 
-# Carrega o modelo treinado
-modelo = joblib.load('modelo_treinado.pkl')
+# Carrega o modelo treinado uma única vez na inicialização do servidor.
+# Isso garante que a predição seja rápida.
+try:
+    modelo = joblib.load('modelo_treinado.pkl')
+except FileNotFoundError:
+    print("Erro: O arquivo 'modelo_treinado.pkl' não foi encontrado. Por favor, execute o script de treinamento primeiro.")
+    modelo = None
 
 def Predict(ativo_id, data_dias):
-
+    if modelo is None:
+        return None
+    
     # Carregar a lista de IDs do arquivo de treino.
-    treino_df = pd.read_excel("data_extract/2025-09-14.xlsx")
+    files = sorted([f for f in os.listdir("data_extract") if f.endswith(".xlsx")])
+    if not files:
+        print("Erro: Nenhum arquivo .xlsx encontrado para obter a lista de IDs.")
+        return None
+
+    # Lê apenas um arquivo para obter todos os IDs únicos usados no treinamento
+    treino_df = pd.read_excel(os.path.join("data_extract", files[0]))
     todos_os_ids = sorted(treino_df['id'].unique())
     
-    # Criar um DataFrame com todas as colunas necessárias de uma só vez.
-    #    Começa com a coluna 'data' e adiciona todas as colunas dummy.
-    #    O `reindex` já lida com a ordem das colunas e preenche com 0.
+    # 1. Preparar o input para o modelo, recriando as colunas dummy
     colunas = ['data'] + [f'id_{i}' for i in todos_os_ids if i != todos_os_ids[0]]
     
-    # Criar uma linha de dados com o formato correto.
+    # Cria uma linha de dados com o formato correto.
     linha_dados = [data_dias]
     
-    # Encontrar a posição do ativo_id na lista ordenada de IDs
+    # Preenche o vetor com zeros para as colunas dummy.
+    # O tamanho é o total de colunas - 1 (a coluna 'data').
+    ativo_vector = [0] * (len(colunas) - 1)
+    
     try:
         idx_ativo = todos_os_ids.index(ativo_id)
-        # O one-hot encoding para o ativo de entrada
+        # Se o ativo não é o primeiro da lista, define a posição correspondente para 1.
         if idx_ativo > 0:
-            # Se o ativo não é o primeiro da lista, o dummy correspondente é 1.
-            # Os demais são 0.
-            ativo_vector = [0] * (len(colunas) - 1)
             ativo_vector[idx_ativo - 1] = 1
-            linha_dados += ativo_vector
-        else:
-            # Se o ativo é o primeiro, todas as colunas dummy são 0 (drop_first).
-            linha_dados += [0] * (len(colunas) - 1)
-
     except ValueError:
-        # Lidar com ativos que não estavam no conjunto de treino.
         print(f"Aviso: O ativo {ativo_id} não estava no conjunto de dados de treino.")
-        return None # Ou algum outro valor padrão
+        return None
 
-    # 4. Criar o DataFrame final para a predição.
+    linha_dados += ativo_vector
     data_input = pd.DataFrame([linha_dados], columns=colunas)
 
     # Reordena as colunas para a mesma ordem do treino, garantindo compatibilidade
     data_input = data_input.reindex(columns=modelo.feature_names_in_, fill_value=0)
 
-    # Realiza a predição
+    # Realiza a predição. O resultado é 0 para 'loss' e 1 para 'gain'.
     prediction = modelo.predict(data_input)
     
     return prediction[0]
-
-# Exemplo de uso
-data_de_previsao = (dt.datetime.now().date() - dt.datetime.strptime('2025-09-14', '%Y-%m-%d').date()).days
-previsao_abev3 = Predict("ABEV3", data_de_previsao)
-
-if previsao_abev3 is not None:
-    print(f"Previsão para ABEV3 em {dt.datetime.now().date()}: {'Gain' if previsao_abev3 == 1 else 'Loss'}")
-else:
-    print("Não foi possível fazer a previsão para ABEV3.")

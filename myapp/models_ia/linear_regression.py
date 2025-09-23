@@ -1,49 +1,58 @@
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
-import matplotlib.pyplot as plt
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
-import seaborn as sns
+from sklearn.metrics import accuracy_score, classification_report
 import joblib
-
+import os
 
 def Ia_Prediction():
-    # Carregar planilha
-    arquivo = pd.read_excel("data_extract/2025-09-14.xlsx")
+    """
+    Carrega todos os dados históricos, treina o modelo de Regressão Logística
+    e o salva em um arquivo .pkl.
+    """
+    # 1. Carregar e concatenar todas as planilhas
+    files = sorted([f for f in os.listdir("data_extract") if f.endswith(".xlsx")])
+    if not files:
+        print("Erro: Nenhum arquivo .xlsx encontrado para treinamento.")
+        return
 
-    # Converter coluna "data" para datetime
+    all_dataframes = [pd.read_excel(os.path.join("data_extract", f)) for f in files]
+    arquivo = pd.concat(all_dataframes, ignore_index=True)
+
+    # 2. Pré-processamento dos dados
+    # Mapeamento do status para valores numéricos, seguindo a lógica do scraper
+    # 'gain' (variacao negativa) -> 1
+    # 'loss' (variacao positiva) -> 0
+    arquivo["status"] = arquivo["status"].map({"gain": 1, "loss": 0})
+
+    # Transformar a data em número de dias para a IA.
     arquivo["data"] = pd.to_datetime(arquivo["data"])
-
-    # Transformar data em número
     arquivo["data"] = (arquivo["data"] - arquivo["data"].min()).dt.days
 
     # Converter coluna "id" em variáveis dummy (one-hot encoding)
     arquivo = pd.get_dummies(arquivo, columns=["id"], drop_first=True)
-
-    # Codificar status
-    arquivo["status"] = arquivo["status"].map({"gain": 1, "loss": 0})
-
-    # Minhas colunas para treino e teste
+    
+    # 3. Treinamento do modelo
     x = arquivo.drop("status", axis=1)
     y = arquivo["status"]
+    
+    if len(x) < 2 or len(y) < 2:
+        print("Aviso: Dados insuficientes para treinamento. Necessita de mais dados históricos.")
+        return
 
-    # Treino e teste
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=42)
-
-    # Modelo de classificação
+    
     modelo = LogisticRegression(max_iter=1000)
     modelo.fit(x_train, y_train)
 
-    # Predição
+    # 4. Avaliação e salvamento
     predict_class = modelo.predict(x_test)
-
-    # Avaliação
     acuracia = accuracy_score(y_test, predict_class)
-    print(f"Acurácia: {acuracia:.2%}")
+    
+    print(f"Modelo treinado com sucesso! Acurácia: {acuracia:.2%}")
     print("\nRelatório de Classificação:")
     print(classification_report(y_test, predict_class))
 
-    # Salvar o modelo treinado para uso posterior
     joblib.dump(modelo, 'modelo_treinado.pkl')
 
    

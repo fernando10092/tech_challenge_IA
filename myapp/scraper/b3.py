@@ -1,28 +1,59 @@
 import requests
 import pandas as pd
 import datetime as dt
+import os
 
+# Obtém a data atual para nomear os arquivos de forma única.
 date = str(dt.datetime.now().date())
 
-response = requests.get("https://ledev.com.br/api/cotacoes")
-
-response = list(response.json())
+try:
+    # Faz a requisição GET para a API de cotações.
+    response = requests.get("https://ledev.com.br/api/cotacoes")
+    # Converte a resposta JSON em uma lista de dicionários.
+    stocks_data = response.json()
+except requests.RequestException as e:
+    print(f"Erro ao buscar dados da API: {e}")
+    # Encerra o script se não puder obter os dados.
+    exit()
 
 data = []
 
-for i, dados in enumerate(response):
-    variacao = float(response[i]["close"]) - float(response[i]["price"])
-    recomendacao = 0
-    if variacao >= 0:
-        recomendacao = "gain"
-    else:
-        recomendacao = "loss"
-    data.append({"id":response[i]["id"],"price":response[i]["price"], "close":response[i]["close"], "status": recomendacao,"data": date})
+# Itera sobre os dados de cada ativo.
+for dados in stocks_data:
+    try:
+        # Calcula a variação entre o preço de fechamento anterior e o preço atual.
+        # Sua correção está aqui, a lógica está correta.
+        variacao = float(dados["close"]) - float(dados["price"])
+        
+        # Atribui "loss" se o preço atual estiver abaixo ou igual ao anterior.
+        # Atribui "gain" se o preço atual estiver acima do anterior.
+        recomendacao = "gain" if variacao < 0 else "loss"
+        
+        # Adiciona os dados processados à lista.
+        data.append({
+            "id": dados["id"],
+            "price": dados["price"],
+            "close": dados["close"],
+            "status": recomendacao,
+            "data": date
+        })
+    except (KeyError, ValueError) as e:
+        # Ignora linhas com dados ausentes ou inválidos.
+        print(f"Aviso: Dados incompletos ou inválidos para um ativo. Pulando... Erro: {e}")
+        continue
 
-
+# Cria o DataFrame a partir da lista de dados processados.
 frame = pd.DataFrame(data)
 
-arquivo = frame.to_excel(f"data_extract/{date}.xlsx", index=False)
-arquivo = frame.to_parquet(f"data_extract/{date}.parquet", index=False)
+# Garante que o diretório 'data_extract' exista.
+if not os.path.exists("data_extract"):
+    os.makedirs("data_extract")
 
-print(arquivo)
+# Salva o DataFrame em arquivos Excel e Parquet.
+excel_file = f"data_extract/{date}.xlsx"
+parquet_file = f"data_extract/{date}.parquet"
+
+frame.to_excel(excel_file, index=False)
+frame.to_parquet(parquet_file, index=False)
+
+print(f"Dados salvos com sucesso em: {excel_file} e {parquet_file}")

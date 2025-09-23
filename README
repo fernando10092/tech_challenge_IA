@@ -1,0 +1,39 @@
+# 📈 Sistema de Previsão de Ativos Financeiros com IA
+
+Este projeto é uma aplicação web desenvolvida em Django que integra um modelo de Machine Learning (Regressão Logística) para prever a tendência (gain ou loss) de ativos financeiros. A aplicação busca dados de uma API, processa-os e exibe um gráfico de histórico de preços junto com a previsão da IA para um ativo específico.
+
+## 🌟 Funcionalidades
+
+- **Coleta de Dados Automática:** Extrai dados de preços de ativos de uma API externa e os armazena em arquivos locais para uso futuro.
+- **Treinamento de Modelo de IA:** Utiliza dados históricos para treinar um modelo de Regressão Logística, que é então salvo para predições rápidas.
+- **Visualização Interativa:** Gera um gráfico de linha do histórico de preços de um ativo selecionado pelo usuário.
+- **Predição de Tendência:** Fornece uma previsão de "Gain" (alta) ou "Loss" (baixa) para o dia seguinte, baseada no modelo de IA.
+- **Interface Web:** Apresenta todas as funcionalidades em uma interface de usuário simples e limpa, construída com HTML e CSS.
+
+## 🛠️ Tecnologias Utilizadas
+
+- **Python**: Linguagem de programação principal.
+- **Django**: Framework web para a construção da aplicação.
+- **Django REST Framework**: Utilizado para criar a view da API.
+- **Pandas**: Para manipulação e análise de dados.
+- **Matplotlib**: Para a geração dos gráficos.
+- **Scikit-learn**: Biblioteca de Machine Learning para o modelo de Regressão Logística.
+- **Joblib**: Para serializar e carregar o modelo treinado.
+- **Requests**: Para fazer requisições à API de dados.
+
+## 🚀 Como Executar o Projeto
+
+Siga os passos abaixo para configurar e rodar o projeto localmente.
+
+### Pré-requisitos
+Certifique-se de ter o Python 3.x instalado em sua máquina.
+
+### 1. Configurar o Ambiente Virtual
+Navegue até o diretório do projeto e crie e ative um ambiente virtual.
+
+```bash
+python -m venv env
+# No Windows
+env\Scripts\activate
+# No macOS/Linux
+source env/bin/activate

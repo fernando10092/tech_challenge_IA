@@ -124,13 +124,11 @@
 <body>
     <div class="container">
         <h1>Análise de Ativos</h1>
-
         <h2 class="section-title">Escolha o Ativo</h2>
         <form method="POST">
             <input name="ativo" type="text" placeholder="Ex: ABCB4" />
             <button type="submit">Buscar</button>
         </form>
-
         <h2 class="section-title">Gráfico de Previsão</h2>
         {% if graphic %}
             <img src="data:image/png;base64,{{ graphic }}" alt="Gráfico de Previsão" />
@@ -139,7 +137,6 @@
                 O gráfico aparecerá aqui após a busca.
             </div>
         {% endif %}
-
         {% if prediction_result is not None %}
         <h2 class="section-title">Previsão da IA para amanhã</h2>
         <div class="prediction-box">
