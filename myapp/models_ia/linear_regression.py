@@ -7,8 +7,9 @@ import os
 
 def Ia_Prediction():
     """
-    Carrega todos os dados históricos, treina o modelo de Regressão Logística
-    e o salva em um arquivo .pkl.
+    Carrega todos os dados históricos, treina o modelo de Regressão Logística,
+    salva a acurácia e o relatório de classificação no objeto do modelo e o salva
+    em um arquivo .pkl.
     """
     # 1. Carregar e concatenar todas as planilhas
     files = sorted([f for f in os.listdir("data_extract") if f.endswith(".xlsx")])
@@ -53,7 +54,8 @@ def Ia_Prediction():
     print("\nRelatório de Classificação:")
     print(classification_report(y_test, predict_class))
 
-    joblib.dump(modelo, 'modelo_treinado.pkl')
+    # Salva a acurácia e o relatório como atributos do modelo antes de salvá-lo
+    modelo.accuracy = acuracia
+    modelo.classification_report_str = classification_report(y_test, predict_class)
 
-   
-Ia_Prediction()
+    joblib.dump(modelo, 'modelo_treinado.pkl')

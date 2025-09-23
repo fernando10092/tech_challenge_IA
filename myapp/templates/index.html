@@ -119,17 +119,31 @@
             color: #dc3545;
             font-weight: bold;
         }
+        .accuracy-box {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #e9f5ff; /* Um azul claro */
+            border: 1px solid #a0d8ff;
+            font-size: 0.9em;
+        }
+        .accuracy-value {
+            font-weight: bold;
+            color: #007bff; /* Azul primário */
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Análise de Ativos</h1>
+
         <h2 class="section-title">Escolha o Ativo</h2>
         <form method="POST">
             <input name="ativo" type="text" placeholder="Ex: ABCB4" />
             <button type="submit">Buscar</button>
         </form>
-        <h2 class="section-title">Gráfico de Previsão</h2>
+
+        <h2 class="section-title">Gráfico de Histórico e Previsão</h2>
         {% if graphic %}
             <img src="data:image/png;base64,{{ graphic }}" alt="Gráfico de Previsão" />
         {% else %}
@@ -137,14 +151,24 @@
                 O gráfico aparecerá aqui após a busca.
             </div>
         {% endif %}
-        {% if prediction_result is not None %}
+
+        {% if prediction_result is not None and ativo %}
         <h2 class="section-title">Previsão da IA para amanhã</h2>
         <div class="prediction-box">
-            <p>A previsão para o ativo **{{ ativo }}** é: 
+            <p>A previsão para o ativo **{{ ativo.upper }}** é: 
                 <span class="{% if prediction_result == 1 %}gain-text{% else %}loss-text{% endif %}">
                     {% if prediction_result == 1 %}GAIN (Alta) {% else %}LOSS (Baixa) {% endif %}
                 </span>
             </p>
+        </div>
+        {% endif %}
+
+        {% if model_accuracy is not None %}
+        <h2 class="section-title">Performance do Modelo de IA</h2>
+        <div class="accuracy-box">
+            <p>Acurácia do Modelo: <span class="accuracy-value">{{ model_accuracy | floatformat:2 | cut:" " }}%</span></p>
+            <p>
+                </p>
         </div>
         {% endif %}
     </div>
