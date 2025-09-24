@@ -143,6 +143,8 @@ padding: 20px;
     <form method="POST">
         <input name="ativo" type="text" placeholder="Ex: ABCB4" />
         <button type="submit">Buscar</button>
+        <button formaction="/download/" formmethod="post" type="submit">REALIZAR SCRAPER PARA ATUALIZAR A API E FONTE DE DADOS</button>
+        {% csrf_token %}
     </form>
 
     <h2 class="section-title">Gráfico de Histórico e Previsão</h2>
