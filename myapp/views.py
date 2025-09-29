@@ -11,11 +11,19 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.shortcuts import render, redirect  
 from django.http import HttpResponse
+from .scraper.b3 import Scraper
 
+# Imports necessários para o banco de dados e serialização
+from .models import Banco
+from .serializer import BancoSerializer
+
+# Imports da sua lógica de IA e Servidor
 from .models_ia.use_ia import Predict, get_model_performance
 from .api.data_server import Server
 
 matplotlib.use('Agg')
+
+# --- Funções de Visualização (VIEWS) ---
 
 @api_view(['GET', 'POST'])
 def Home(request):
@@ -25,6 +33,7 @@ def Home(request):
     predicted_price = None
     model_accuracy = get_model_performance()
 
+    # Home view APENAS LÊ os dados existentes (não executa o scraper)
     data_list = Server()
 
     if request.method == 'POST':
@@ -43,13 +52,15 @@ def Home(request):
 
             data_de_hoje = dt.datetime.now().date()
             if data_list:
+                # Tentativa de obter data de treino, se houver dados
                 data_de_treino_base = pd.to_datetime(data_list[0]['data'].iloc[0]).date()
             else:
+                # Data de fallback
                 data_de_treino_base = dt.datetime.strptime('2025-09-14', '%Y-%m-%d').date()
             
             dias_desde_treino = (data_de_hoje - data_de_treino_base).days
             if dias_desde_treino < 0:
-                 dias_desde_treino = 0
+                dias_desde_treino = 0
 
             prediction_result = Predict(ativo.upper().strip(), dias_desde_treino)
 
@@ -109,48 +120,22 @@ def Server_View(request):
     return Response({"dados": dados_dict})
 
 
-@api_view(['POST'])
+@api_view(['POST', 'GET'])
 def Download(request):
-    Scraper()
+    """
+    View responsável por executar o Scraper e redirecionar para a Home.
+    """
+    print("View Download: Atualizando dados...")
+    Scraper() # CHAMA A FUNÇÃO SCRAPER
     return redirect('home')
-    
-def Scraper():
-    date = str(dt.datetime.now().date())
 
-    try:
-        response = requests.get("https://ledev.com.br/api/cotacoes")
-        stocks_data = response.json()
-    except requests.RequestException as e:
-        print(f"Erro ao buscar dados da API: {e}")
-        exit()
-
-    data = []
-
-    for dados in stocks_data:
-        try:
-            variacao = float(dados["close"]) - float(dados["price"])
-            recomendacao = "gain" if variacao < 0 else "loss"
-            
-            data.append({
-                "id": dados["id"],
-                "price": dados["price"],
-                "close": dados["close"],
-                "status": recomendacao,
-                "data": date
-            })
-        except (KeyError, ValueError) as e:
-            print(f"Aviso: Dados incompletos ou inválidos para um ativo. Pulando... Erro: {e}")
-            continue
-
-    frame = pd.DataFrame(data)
-
-    if not os.path.exists("data_extract"):
-        os.makedirs("data_extract")
-
-    excel_file = f"data_extract/{date}.xlsx"
-    parquet_file = f"data_extract/{date}.parquet"
-
-    frame.to_excel(excel_file, index=False)
-    frame.to_parquet(parquet_file, index=False)
-
-    print(f"Dados salvos com sucesso em: {excel_file} e {parquet_file}")
+@api_view(['GET', 'POST'])
+def DB_View(request):
+    """
+    View para expor os dados salvos no banco de dados via API.
+    """
+    if request.method == "POST":
+        return Response({"message": "Use GET method to retrieve data."}, status=400)
+    banco = Banco.objects.all()
+    serializer = BancoSerializer(banco, many=True)
+    return Response(serializer.data, 200)

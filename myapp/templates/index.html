@@ -142,8 +142,11 @@ padding: 20px;
     <h2 class="section-title">Escolha o Ativo</h2>
     <form method="POST">
         <input name="ativo" type="text" placeholder="Ex: ABCB4" />
-        <button type="submit">Buscar</button>
-        <button formaction="/download/" formmethod="post" type="submit">REALIZAR SCRAPER PARA ATUALIZAR A API E FONTE DE DADOS</button>
+        <button type="submit">Buscar</button> 
+        {% csrf_token %}
+    </form>
+    <form method="POST" action="/download/">
+        <button type="submit">Fazer Scraper da B3</button>
         {% csrf_token %}
     </form>
 
