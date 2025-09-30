@@ -12,6 +12,7 @@ from rest_framework.response import Response
 from django.shortcuts import render, redirect  
 from django.http import HttpResponse
 from .scraper.b3 import Scraper
+from .serializer import BancoSerializer
 
 # Imports necessários para o banco de dados e serialização
 from .models import Banco
@@ -20,6 +21,7 @@ from .serializer import BancoSerializer
 # Imports da sua lógica de IA e Servidor
 from .models_ia.use_ia import Predict, get_model_performance
 from .api.data_server import Server
+from .models import Banco
 
 matplotlib.use('Agg')
 
@@ -139,3 +141,10 @@ def DB_View(request):
     banco = Banco.objects.all()
     serializer = BancoSerializer(banco, many=True)
     return Response(serializer.data, 200)
+
+@api_view(['GET', 'POST'])
+def Teste_View(request):
+    banco = Banco.objects.all()
+    serializer = BancoSerializer(banco, many=True)
+    print(serializer.data)
+    return Response({"message": "Dados impressos no console do servidor."}, status=200)

@@ -7,4 +7,5 @@ urlpatterns = [
     path('server/', views.Server_View),
     path('download/', views.Download),
     path('db/', views.DB_View),
+    path('teste/', views.Teste_View),
 ]
