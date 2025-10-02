@@ -7,6 +7,7 @@ from myapp.models import Banco
 def Scraper():
     """
     Função principal do Scraper que busca dados, salva no banco de dados e em arquivos.
+    Usa update_or_create para evitar o erro de UNIQUE constraint failed.
     """
     date = str(dt.datetime.now().date())
     print(f"Executando Scraper para data: {date}")
@@ -16,7 +17,7 @@ def Scraper():
         stocks_data = response.json()
     except requests.RequestException as e:
         print(f"Erro ao buscar dados da API: {e}")
-        return # Use return em vez de exit() dentro de uma função chamada por uma view
+        return 
 
     data = []
 
@@ -25,6 +26,7 @@ def Scraper():
             variacao = float(dados["close"]) - float(dados["price"])
             recomendacao = "gain" if variacao < 0 else "loss"
             
+            # Estrutura para salvar nos arquivos Excel/Parquet
             data.append({
                 "id": dados["id"],
                 "price": dados["price"],
@@ -33,19 +35,22 @@ def Scraper():
                 "data": date
             })
 
-            # Salva no banco de dados (A versão que você queria usar)
-            banco = Banco(
-                id=dados["id"],
-                price=dados["price"],
-                close=dados["close"],
-                status=recomendacao,
-                data=date
+            # --- CORREÇÃO: USAR update_or_create para evitar o erro UNIQUE constraint failed ---
+            # Se o registro (ativo_id + data) existir, ele atualiza os defaults (price, close, status).
+            # Se não existir, ele cria um novo.
+            Banco.objects.update_or_create(
+                ativo_id=dados["id"],
+                data=date,
+                defaults={
+                    'price': dados["price"],
+                    'close': dados["close"],
+                    'status': recomendacao
+                }
             )
-            banco.save()
-            # O print está aqui para debug, mas pode ser removido em produção
-            # print(f"Dados salvos no banco de dados: {banco}") 
-        except (KeyError, ValueError) as e:
-            print(f"Aviso: Dados incompletos ou inválidos para um ativo. Pulando... Erro: {e}")
+
+        except (KeyError, ValueError, Exception) as e:
+            # Captura qualquer erro no processamento de dados ou DB
+            print(f"Aviso: Dados incompletos ou inválidos para um ativo ({dados.get('id', 'N/A')}). Erro: {e}")
             continue
 
     frame = pd.DataFrame(data)
@@ -59,4 +64,4 @@ def Scraper():
     frame.to_excel(excel_file, index=False)
     frame.to_parquet(parquet_file, index=False)
 
-    print(f"Dados salvos com sucesso em: {excel_file} e {parquet_file}")
+    print(f"Dados salvos com sucesso em arquivos: {excel_file} e {parquet_file}")

@@ -4,4 +4,5 @@ from .models import Banco
 class BancoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Banco
-        fields = '__all__'
+        # Agora estamos serializando o 'ativo_id' que contém o ticker
+        fields = ('ativo_id', 'price', 'close', 'status', 'data')
